@@ -48,6 +48,14 @@ public abstract class AbsBoxingActivity extends AppCompatActivity implements Box
         Boxing.get().setupFragment(view, this);
     }
 
+    public void reCreate(){
+        /*AbsBoxingViewFragment view = onCreateBoxingView(getSelectedMedias(getIntent()));
+        BoxingConfig pickerConfig = BoxingManager.getInstance().getBoxingConfig();
+        view.setPresenter(new PickerPresenter(view));
+        view.setPickerConfig(pickerConfig);
+        Boxing.get().setupFragment(view, this);*/
+    }
+
     private ArrayList<BaseMedia> getSelectedMedias(Intent intent) {
         return intent.getParcelableArrayListExtra(Boxing.EXTRA_SELECTED_MEDIA);
     }

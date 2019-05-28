@@ -50,6 +50,11 @@ public class BoxingActivity extends AbsBoxingActivity {
         setTitleTxt(getBoxingConfig());
     }
 
+    @Override
+    public void reCreate() {
+        onCreateBoxingView(new ArrayList<BaseMedia>());
+    }
+
     @NonNull
     @Override
     public AbsBoxingViewFragment onCreateBoxingView(ArrayList<BaseMedia> medias) {

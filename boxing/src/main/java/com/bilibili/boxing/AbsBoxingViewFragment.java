@@ -25,6 +25,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -39,6 +41,7 @@ import com.bilibili.boxing.model.entity.AlbumEntity;
 import com.bilibili.boxing.model.entity.BaseMedia;
 import com.bilibili.boxing.model.entity.impl.ImageMedia;
 import com.bilibili.boxing.presenter.PickerContract;
+import com.bilibili.boxing.utils.BoxingFileHelper;
 import com.bilibili.boxing.utils.CameraPickerHelper;
 
 import java.io.File;
@@ -302,6 +305,9 @@ public abstract class AbsBoxingViewFragment extends Fragment implements PickerCo
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 999) {
+            ((AbsBoxingActivity) getActivity()).recreate();
+        }
         if (mCameraPicker != null && requestCode == CameraPickerHelper.REQ_CODE_CAMERA) {
             onCameraActivityResult(requestCode, resultCode);
         }
@@ -399,7 +405,7 @@ public abstract class AbsBoxingViewFragment extends Fragment implements PickerCo
     public final int getMaxCount() {
         BoxingConfig config = BoxingManager.getInstance().getBoxingConfig();
         if (config == null) {
-           return BoxingConfig.DEFAULT_SELECTED_COUNT;
+            return BoxingConfig.DEFAULT_SELECTED_COUNT;
         }
         return config.getMaxCount();
     }
@@ -425,6 +431,7 @@ public abstract class AbsBoxingViewFragment extends Fragment implements PickerCo
         }
     }
 
+    private String FILE_PATH = "/sdcard/" + System.currentTimeMillis() + ".mp4";
     /**
      * start camera to take a photo.
      *
@@ -439,6 +446,24 @@ public abstract class AbsBoxingViewFragment extends Fragment implements PickerCo
             } else {
                 if (!BoxingManager.getInstance().getBoxingConfig().isVideoMode()) {
                     mCameraPicker.startCamera(activity, fragment, subFolderPath);
+                } else {
+                    //打开系统摄像机exposed beyond app through ClipData.Item.getUri()
+                    /*Intent intent = new Intent();
+                    intent.setAction("android.media.action.VIDEO_CAPTURE");
+                    intent.addCategory("android.intent.category.DEFAULT");
+                    File file = new File(FILE_PATH);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    Uri uri = Uri.fromFile(file);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    startActivityForResult(intent, 999);*/
+                    // 拍摄视频
+                    Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                    // 录制视频最大时长15s
+                    intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 15);
+                    startActivityForResult(intent, 999);
                 }
             }
         } catch (IllegalArgumentException | IllegalStateException e) {
